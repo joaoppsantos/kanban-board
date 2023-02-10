@@ -9,6 +9,13 @@ import { taskList, workflows, workflowMapping } from '../../utils/data';
 const Board = () => {
   const [tickets, setTicketsStatus] = useState(taskList);
 
+  useEffect(() => {
+    const localStorageTickets = localStorage.getItem('tickets');
+    if (localStorageTickets) {
+      setTicketsStatus(JSON.parse(localStorageTickets));
+    }
+  }, []);
+
   const replaceTicketStatus = useCallback(
     (id, status) => {
       const ticketIndex = tickets.findIndex((ticket) => ticket.id === id);
@@ -17,6 +24,7 @@ const Board = () => {
         index === ticketIndex ? ticketToUpdate : t
       );
       setTicketsStatus(newTasks);
+      localStorage.setItem('tickets', JSON.stringify(newTasks));
     },
     [tickets]
   );
