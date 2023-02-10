@@ -1,13 +1,20 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { useParams, useHistory } from 'react-router-dom';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import BoardItem from '../BoardItem/BoardItem';
 import BoardColumn from '../BoardColumn/BoardColumn';
 import './Board.css';
 import { taskList, workflows, workflowMapping } from '../../utils/data';
+import SelectedTask from '../SelectedTask/SelectedTask';
 
 const Board = () => {
+  const { id } = useParams();
   const [tickets, setTicketsStatus] = useState(taskList);
+  const [selectedTask, setSelectedTask] = useState(
+    taskList.find((ticket) => ticket.id === id)
+  );
+  const history = useHistory();
 
   useEffect(() => {
     const localStorageTickets = localStorage.getItem('tickets');
@@ -29,8 +36,13 @@ const Board = () => {
     [tickets]
   );
 
+  const handleItemClick = (task) => {
+    setSelectedTask(task);
+    history.push(`/ticket/${task.id}`);
+  };
+
   return (
-    <main>
+    <main className="main-container">
       <div className="container">
         <header className="title">
           <h1>Board</h1>
@@ -52,7 +64,11 @@ const Board = () => {
                       {tickets.reduce((acc, ticket) => {
                         if (ticket.status === workflow) {
                           acc.push(
-                            <BoardItem key={ticket.id} id={ticket.id}>
+                            <BoardItem
+                              key={ticket.id}
+                              id={ticket.id}
+                              onClick={() => handleItemClick(ticket)}
+                            >
                               <div className="item">{ticket.title}</div>
                             </BoardItem>
                           );
@@ -67,6 +83,12 @@ const Board = () => {
           </div>
         </DndProvider>
       </div>
+      {selectedTask?.title && (
+        <SelectedTask
+          task={selectedTask}
+          taskStatus={workflowMapping[selectedTask.status]}
+        />
+      )}
     </main>
   );
 };

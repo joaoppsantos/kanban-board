@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { useDrag } from 'react-dnd';
 
-const BoardItem = ({ id, children }) => {
+const BoardItem = ({ id, children, onClick }) => {
   const ref = useRef(null);
   const [{ isDragging }, drag] = useDrag({
     type: 'column',
@@ -13,7 +13,7 @@ const BoardItem = ({ id, children }) => {
 
   drag(ref);
   return (
-    <div ref={ref} style={{ opacity: isDragging ? 0.2 : 1 }}>
+    <div ref={ref} style={{ opacity: isDragging ? 0.2 : 1 }} onClick={onClick}>
       {children}
     </div>
   );
