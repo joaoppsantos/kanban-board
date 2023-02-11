@@ -7,6 +7,7 @@ import BoardColumn from '../BoardColumn/BoardColumn';
 import './Board.css';
 import { taskList, workflows, workflowMapping } from '../../utils/data';
 import SelectedTask from '../SelectedTask/SelectedTask';
+import AddTaskForm from '../AddTaskForm/AddTaskForm';
 
 const Board = () => {
   const { id } = useParams();
@@ -19,9 +20,26 @@ const Board = () => {
   useEffect(() => {
     const localStorageTickets = localStorage.getItem('tickets');
     if (localStorageTickets) {
-      setTicketsStatus(JSON.parse(localStorageTickets));
+      const parsedTickets = JSON.parse(localStorageTickets);
+      setTicketsStatus(parsedTickets);
+      setSelectedTask(parsedTickets.find((ticket) => ticket.id === id));
     }
   }, []);
+
+  const addTask = (newTask) => {
+    const id = Math.floor(Math.random() * 1000);
+    setTicketsStatus([
+      ...tickets,
+      { id: `${id}`, status: 'backlog', ...newTask },
+    ]);
+    localStorage.setItem(
+      'tickets',
+      JSON.stringify([
+        ...tickets,
+        { id: `${id}`, status: 'backlog', ...newTask },
+      ])
+    );
+  };
 
   const replaceTicketStatus = useCallback(
     (id, status) => {
@@ -83,12 +101,13 @@ const Board = () => {
           </div>
         </DndProvider>
       </div>
-      {selectedTask?.title && (
+      {selectedTask?.title ? (
         <SelectedTask
           task={selectedTask}
           taskStatus={workflowMapping[selectedTask.status]}
         />
-      )}
+      ) : null}
+      <AddTaskForm addTask={addTask} />
     </main>
   );
 };

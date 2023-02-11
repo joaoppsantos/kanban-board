@@ -13,6 +13,8 @@
   border-radius: 2px;
   cursor: pointer;
   background-color: lightblue;
+  color: white;
+  font-weight: 600;
 }
 
 .board-scheme {
@@ -64,6 +66,7 @@
   flex-direction: column;
   align-items: center;
   margin: 32px 32px 0 24px;
+  min-width: 250px;
 }
 
 @media only screen and (max-width: 511px) {
@@ -103,4 +106,50 @@
 .selected-task-wrapper {
   display: flex;
   justify-content: center;
+}
+
+.form-entry {
+  display: flex;
+  flex-direction: column;
+  margin: 8px 0;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 16px auto;
+  padding: 16px;
+  background-color: white;
+  border-radius: 8px;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+input,
+textarea {
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+button[type='submit'] {
+  padding: 8px 16px;
+  background-color: cadetblue;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+button[type='submit']:hover {
+  background-color: black;
 }
