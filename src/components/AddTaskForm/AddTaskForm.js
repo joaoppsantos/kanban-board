@@ -29,6 +29,7 @@ const AddTaskForm = ({ addTask }) => {
         <input
           type="text"
           id="task-title"
+          data-testid="task-title"
           value={title}
           onChange={(event) => setTitle(event.target.value)}
         />
@@ -38,6 +39,7 @@ const AddTaskForm = ({ addTask }) => {
         <input
           type="text"
           id="task-type"
+          data-testid="task-type"
           value={type}
           onChange={(event) => setType(event.target.value)}
         />
@@ -46,11 +48,14 @@ const AddTaskForm = ({ addTask }) => {
         <label htmlFor="task-description">Task Description:</label>
         <textarea
           id="task-description"
+          data-testid="task-description"
           value={description}
           onChange={(event) => setDescription(event.target.value)}
         />
       </div>
-      <button type="submit">Add Task</button>
+      <button data-testid="submit-button" type="submit">
+        Add Task
+      </button>
     </form>
   );
 };
