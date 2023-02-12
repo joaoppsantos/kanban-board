@@ -6,14 +6,19 @@ import BoardItem from '../BoardItem/BoardItem';
 import BoardColumn from '../BoardColumn/BoardColumn';
 import SelectedTask from '../SelectedTask/SelectedTask';
 import AddTaskForm from '../AddTaskForm/AddTaskForm';
+import {
+  fallbackTasks,
+  fallbackWorkflows,
+  fallbackWorkflowMapping,
+} from '../../utils/FallbackData';
 import axios from 'axios';
 import './Board.css';
 
 const Board = () => {
+  const { id } = useParams();
   const [tasks, setTasks] = useState([]);
   const [workflows, setWorkflows] = useState([]);
   const [workflowMapping, setWorkflowMapping] = useState({});
-  const { id } = useParams();
   const [tickets, setTicketsStatus] = useState(tasks);
   const [selectedTask, setSelectedTask] = useState(
     tasks.find((ticket) => ticket.id === id)
@@ -21,36 +26,49 @@ const Board = () => {
   const history = useHistory();
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3000/tasks')
-      .then((response) => {
-        setTasks(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    const localStorageTickets = localStorage.getItem('tickets');
+    if (localStorageTickets) {
+      const parsedTickets = JSON.parse(localStorageTickets);
+      setTicketsStatus(parsedTickets);
+      setSelectedTask(parsedTickets.find((ticket) => ticket.id === id));
+    } else {
+      axios
+        .get('http://localhost:3000/tasks')
+        .then((response) => setTasks(response.data))
+        .catch((error) => {
+          setTasks(fallbackTasks);
+          console.error(
+            error,
+            'Make use of FallbackData so that we can still show the board when it fails to load'
+          );
+        });
+    }
 
     axios
       .get('http://localhost:3000/workflows')
-      .then((response) => {
-        setWorkflows(response.data);
-      })
+      .then((response) => setWorkflows(response.data))
       .catch((error) => {
-        console.error(error);
+        setWorkflows(fallbackWorkflows);
+        console.log(
+          error,
+          'Make use of FallbackData so that we can still show the board when it fails to load'
+        );
       });
-
     axios
       .get('http://localhost:3000/workflowMapping')
-      .then((response) => {
-        setWorkflowMapping(response.data);
-      })
+      .then((response) => setWorkflowMapping(response.data))
       .catch((error) => {
-        console.error(error);
+        setWorkflowMapping(fallbackWorkflowMapping);
+        console.log(
+          error,
+          'Make use of FallbackData so that we can still show the board when it fails to load'
+        );
       });
   }, []);
 
   useEffect(() => {
-    if (!tasks) {
+    if (tasks) {
+      setSelectedTask(tasks.find((task) => task.id === id));
       setTicketsStatus(tasks);
     }
   }, [tasks]);
@@ -77,10 +95,6 @@ const Board = () => {
     [tickets]
   );
 
-  if (!tasks && !workflows && !workflowMapping) {
-    return null;
-  }
-
   const addTask = (newTask) => {
     const id = Math.floor(Math.random() * 1000);
     setTicketsStatus([
@@ -101,6 +115,10 @@ const Board = () => {
     history.push(`/ticket/${task.id}`);
   };
 
+  if (!tasks && !workflows && !workflowMapping) {
+    return null;
+  }
+
   return (
     <main className="main-container">
       <div className="container">
@@ -110,12 +128,11 @@ const Board = () => {
         <DndProvider backend={HTML5Backend}>
           <div className="board-scheme">
             {workflows.map((workflow) => (
-              <div className="column-container">
+              <div key={workflow} className="column-container">
                 <div className="column">
                   <BoardColumn
                     status={workflow}
                     replaceTicketStatus={replaceTicketStatus}
-                    key={workflow}
                   >
                     <div className="column-header">
                       {workflowMapping[workflow]}
